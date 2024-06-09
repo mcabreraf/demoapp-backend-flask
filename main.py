@@ -4,7 +4,7 @@ from model import Contact
 
 @app.route('/')
 def hello_world():
-    return 'Hello, World!'
+    return 'Hello, World! How are you doing today? I am doing great!'
 
 # @app.route('/contacts', methods=['GET'])
 # def get_contacts():
