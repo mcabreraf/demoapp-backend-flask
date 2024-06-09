@@ -1,2 +1,5 @@
 instance
 __pycache__
+.env
+powershell
+aws-ecs-flask-react-key-pair.ppk

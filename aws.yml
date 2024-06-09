@@ -1,0 +1,67 @@
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+
+name: Deploy to Amazon ECS
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    env:
+      AWS-DEFAULT-REGION: us-east-2
+      AWS_ECR_REPOSITORY_NAME: aws-flask-react-demo-ecr
+      AWS_ECS_CLUSTER_NAME: aws-flask-cluster
+      AWS_ECS_SERVICE_NAME: aws-ecs-flask-service
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push Docker image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ env.AWS_ECR_REPOSITORY_NAME }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build --build-arg AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            --build-arg AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            --build-arg AWS_DEFAULT_REGION="${{ env.AWS_DEFAULT_REGION }}" \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: aws-task-definition.json
+        container-name: ${{ env.AWS_ECR_REPOSITORY_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        family: ${{ steps.task-def.outputs.family }}
+        container-name: ${{ env.AWS_ECR_REPOSITORY_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+        cluster: ${{ env.AWS_ECS_CLUSTER_NAME }}
+        service: ${{ env.AWS_ECS_SERVICE_NAME }}
+        wait-for-service-stability: true
+        max-stability-retries: 30
+        deployment-configuration: '{"maximumPercent":200,"minimumHealthyPercent":100}'
+      
