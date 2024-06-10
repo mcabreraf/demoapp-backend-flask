@@ -60,12 +60,7 @@ jobs:
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
-        family: ${{ steps.task-def.outputs.family }}
-        container-name: ${{ env.AWS_ECR_REPOSITORY_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
         cluster: ${{ env.AWS_ECS_CLUSTER_NAME }}
         service: ${{ env.AWS_ECS_SERVICE_NAME }}
         wait-for-service-stability: true
-        max-stability-retries: 30
-        deployment-configuration: '{"maximumPercent":200,"minimumHealthyPercent":100}'
       
