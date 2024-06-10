@@ -6,14 +6,14 @@ from model import Contact
 def hello_world():
     return 'Hello, World! How are you doing today? I am doing great!'
 
-# @app.route('/contacts', methods=['GET'])
-# def get_contacts():
-#     contacts = db.session.query(Contact).all()
-#     json_contacts = list(map(lambda x: x.to_json(), contacts))
-#     return (
-#         jsonify({"contacts": json_contacts}),
-#         200
-#     )
+@app.route('/contacts', methods=['GET'])
+def get_contacts():
+    contacts = db.session.query(Contact).all()
+    json_contacts = list(map(lambda x: x.to_json(), contacts))
+    return (
+        jsonify({"contacts": json_contacts}),
+        200
+    )
 
 # @app.route('/create_contact', methods=['POST'])
 # def create_contact():
