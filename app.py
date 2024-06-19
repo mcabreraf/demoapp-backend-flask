@@ -4,10 +4,6 @@ from config import app, db, jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 from model import Contact, User
 
-@app.route('/health')
-def health_check():
-    return 'Server is running!'
-
 @app.route('/register', methods=['POST'])
 def register():
     username  = request.json.get("username")
