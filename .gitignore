@@ -1,5 +1,7 @@
 instance
 __pycache__
 .env
+migrations
 powershell
 aws-ecs-flask-react-key-pair.ppk
+jwt_secret_key_generator.py

@@ -44,6 +44,7 @@ jobs:
             --build-arg POSTGRES_PW="${{ secrets.POSTGRES_PW }}" \
             --build-arg POSTGRES_DB="${{ secrets.POSTGRES_DB }}" \
             --build-arg POSTGRES_HOST="${{ secrets.POSTGRES_HOST }}" \
+            --build-arg JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}" \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
