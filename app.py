@@ -37,22 +37,32 @@ def register():
             400
         )
 
-@app.route('/login', methods=['POST'])  
+@app.route('/login', methods=['POST', 'OPTIONS'])  
 def login():
-    username = request.json.get("username")
-    password = request.json.get("password")
+    if request.method == 'OPTIONS':
+        response = app.make_default_options_response()
+        headers = None
+        if request.headers.get('Access-Control-Request-Headers') is not None:
+            headers = request.headers['Access-Control-Request-Headers']
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', headers)
+        response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        return response
+    else:
+        username = request.json.get("username")
+        password = request.json.get("password")
 
-    user = db.session.query(User).filter_by(username=username).first()
-    if user and check_password_hash(user.password, password):
-        access_token = create_access_token(identity=user.id)
+        user = db.session.query(User).filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            access_token = create_access_token(identity=user.id)
+            return (
+                jsonify(access_token=access_token)
+            )
+        
         return (
-            jsonify(access_token=access_token)
+            jsonify({"error": "Invalid username or password"}), 
+            401
         )
-    
-    return (
-        jsonify({"error": "Invalid username or password"}), 
-        401
-    )
 
 @app.route('/contacts', methods=['GET'])
 @jwt_required()

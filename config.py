@@ -23,3 +23,5 @@ app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
+
+CORS(app, resources={r"/*": {"origins": "*"}})
