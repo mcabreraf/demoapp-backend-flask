@@ -1,5 +1,6 @@
 from flask import request, jsonify, make_response
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_cors import cross_origin
 from config import app, db, jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 from model import Contact, User
@@ -38,10 +39,11 @@ def register():
         )
 
 @app.route('/login', methods=['POST', 'OPTIONS'])  
+@cross_origin()
 def login():
     if request.method == 'OPTIONS':
         response = make_response()
-        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Origin', 'https://www.manuelprojectsinaws.com')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
         response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
         return response
