@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from config import app, db, jwt
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -40,12 +40,9 @@ def register():
 @app.route('/login', methods=['POST', 'OPTIONS'])  
 def login():
     if request.method == 'OPTIONS':
-        response = app.make_default_options_response()
-        headers = None
-        if request.headers.get('Access-Control-Request-Headers') is not None:
-            headers = request.headers['Access-Control-Request-Headers']
+        response = make_response()
         response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Headers', headers)
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
         response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
         return response
     else:
