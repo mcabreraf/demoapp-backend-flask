@@ -41,27 +41,20 @@ def register():
 @app.route('/login', methods=['POST', 'OPTIONS'])  
 @cross_origin()
 def login():
-    if request.method == 'OPTIONS':
-        response = make_response()
-        response.headers.add('Access-Control-Allow-Origin', 'https://www.manuelprojectsinaws.com')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-        response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
-        return response
-    else:
-        username = request.json.get("username")
-        password = request.json.get("password")
+    username = request.json.get("username")
+    password = request.json.get("password")
 
-        user = db.session.query(User).filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
-            access_token = create_access_token(identity=user.id)
-            return (
-                jsonify(access_token=access_token)
-            )
-        
+    user = db.session.query(User).filter_by(username=username).first()
+    if user and check_password_hash(user.password, password):
+        access_token = create_access_token(identity=user.id)
         return (
-            jsonify({"error": "Invalid username or password"}), 
-            401
+            jsonify(access_token=access_token)
         )
+    
+    return (
+        jsonify({"error": "Invalid username or password"}), 
+        401
+    )
 
 @app.route('/contacts', methods=['GET'])
 @jwt_required()
