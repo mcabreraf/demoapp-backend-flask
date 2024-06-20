@@ -5,6 +5,13 @@ from config import app, db, jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 from model import Contact, User
 
+@app.after_request
+def add_cors_headers(response):
+    response.headers.add('Access-Control-Allow-Origin', 'https://www.manuelprojectsinaws.com')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS')
+    return response
+
 @app.route('/')
 def health_check():
     return 'OK', 200
