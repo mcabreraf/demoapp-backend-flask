@@ -7,9 +7,9 @@ from model import Contact, User
 
 @app.after_request
 def add_cors_headers(response):
-    response.headers.add('Access-Control-Allow-Origin', 'https://www.manuelprojectsinaws.com')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS')
+    response.headers['Access-Control-Allow-Origin'] = 'https://www.manuelprojectsinaws.com'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,PATCH,DELETE,OPTIONS'
     return response
 
 @app.route('/')
@@ -46,8 +46,12 @@ def register():
         )
 
 @app.route('/login', methods=['POST', 'OPTIONS'])  
-@cross_origin()
+@cross_origin(origins='https://www.manuelprojectsinaws.com')
 def login():
+    if request.method == 'OPTIONS':
+        response = jsonify({'status': 'options preflight'})
+        return response
+    
     username = request.json.get("username")
     password = request.json.get("password")
 
